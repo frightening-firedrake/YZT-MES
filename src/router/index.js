@@ -68,7 +68,7 @@ export const constantRoutes = [{
     },
     children: [{
         path: 'WarehouseModeling/WarehouseDefinition',
-        name: 'WarehouseDefinition',
+        name: 'WarehouseDefinitionf',
         // redirect: '/WarehouseModeling/WarehouseDefinition/WarehouseDefinition',
         component: () => import('@/views//WarehouseModeling/WarehouseDefinition/index'), // Parent router-view
         meta: {
