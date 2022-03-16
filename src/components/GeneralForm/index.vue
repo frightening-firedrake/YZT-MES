@@ -13,6 +13,12 @@
                 <el-option v-for="(optionItem,index) in item.optionList" :label="optionItem.label" :value="optionItem.value"></el-option>
               </el-select>
             </template>
+            <!-- 多选下拉框  -->
+            <template v-if="item.type=='selectGroup'">
+                <el-select v-model="form[item.model]" multiple placeholder="请选择">
+                  <el-option v-for="item in item.optionList" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                </el-select>
+            </template>
             <!-- 时间日期这个感觉不一定用得上啊 -->
             <template v-if="item.type=='date'">
               <el-col :span="11">
@@ -30,6 +36,7 @@
             <!-- 开关按钮  -->
             <template v-if="item.type=='switch'">
               <el-switch v-model="form[item.model]" :disabled="item.disabled"></el-switch>
+              <span class='switch' style="color: #606266;margin-left:6px;">{{form[item.model]?'是':'否'}}</span>
             </template>
             <!-- 多选框  -->
             <template v-if="item.type=='checkbox'">
@@ -87,7 +94,6 @@
               </el-upload>
               <div class='errormsg' v-show="uploadFileError">{{uploadFileError}}</div>
             </template>
-            
             <!-- 设备读数  -->
             <template v-if="item.type=='equipmentReading'">
                 <el-table
@@ -111,7 +117,6 @@
                 </el-table>
                 <div class="equipmentReading"><span @click="addEquipmentReading">+添加一行</span></div>
             </template>
-
             <!-- 次品项列表  -->
             <template v-if="item.type=='addKind'">
                 <el-table
@@ -124,66 +129,128 @@
                       <span class="el-icon-close" style="color: red;cursor: pointer;font-weight:800;" @click="delKind(scope.row)"></span>
                     </template>
                   </el-table-column>
-                  <el-table-column label="读数名称/单位" width="320">
+                  <el-table-column label="次品分类" width="auto">
                     <template slot-scope="scope">
-                      <el-select v-model="scope.row.select" placeholder="请选择">
-                        <el-option v-for="(selectlistItem,index) in scope.row.selectlist" :label="selectlistItem.label" :value="selectlistItem.value" ></el-option>
+                      <el-select class="addkind" v-model="scope.row.select1" placeholder="请选择">
+                        <el-option v-for="(selectlistItem,index) in scope.row.selectlist1" :label="selectlistItem.label" :value="selectlistItem.value" ></el-option>
                       </el-select>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="default" align="center" label="初始值"></el-table-column>
+                  <el-table-column label="次品项名称" width="auto">
+                    <template slot-scope="scope">
+                      <el-select class="addkind" v-model="scope.row.select2" placeholder="请选择">
+                        <el-option v-for="(selectlistItem,index) in scope.row.selectlist2" :label="selectlistItem.label" :value="selectlistItem.value" ></el-option>
+                      </el-select>
+                    </template>
+                  </el-table-column>
                 </el-table>
                 <div class="equipmentReading"><span @click="addKind">+添加一行</span></div>
             </template>
-
             <!-- 物料列表  -->
             <template v-if="item.type=='addMaterial'">
                 <el-table
                   size='mini'
                   :data="materialTableData"
                   header-row-class-name="yztHeader"
-                  style="width: 500px;border:1px solid rgba(242, 242, 242, 1);border-bottom:none; border-box;">
+                  style="width: 900px;border:1px solid rgba(242, 242, 242, 1);border-bottom:none; border-box;">
                   <el-table-column label="" align="center" width="60">
                     <template slot-scope="scope">
                       <span class="el-icon-close" style="color: red;cursor: pointer;font-weight:800;" @click="delMaterial(scope.row)"></span>
                     </template>
                   </el-table-column>
-                  <el-table-column label="读数名称/单位" width="320">
+                  <el-table-column
+                    type="index"
+                    label="行号"
+                    align="center"
+                    width="60">
+                  </el-table-column>
+                  <el-table-column label="物料编号/名称" width="auto">
                     <template slot-scope="scope">
-                      <el-select v-model="scope.row.select" placeholder="请选择">
-                        <el-option v-for="(selectlistItem,index) in scope.row.selectlist" :label="selectlistItem.label" :value="selectlistItem.value" ></el-option>
+                      <el-select v-model="scope.row.select1" placeholder="请选择">
+                        <el-option v-for="(selectlistItem,index) in scope.row.selectlist1" :label="selectlistItem.label" :value="selectlistItem.value" ></el-option>
                       </el-select>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="default" align="center" label="初始值"></el-table-column>
+                  <el-table-column prop="desc" align="center" width="200" label="规格描述"></el-table-column>
+                  <el-table-column label="嵌套数" width="120">
+                    <template slot-scope="scope">
+                      <el-input class="addMaterial" v-model="scope.row.num"></el-input>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="单位" width="120">
+                    <template slot-scope="scope">
+                      <el-select class="addMaterial" v-model="scope.row.select2" placeholder="请选择">
+                        <el-option v-for="(selectlistItem,index) in scope.row.selectlist2" :label="selectlistItem.label" :value="selectlistItem.value" ></el-option>
+                      </el-select>
+                    </template>
+                  </el-table-column>
                 </el-table>
                 <div class="equipmentReading"><span @click="addMaterial">+添加一行</span></div>
             </template>
-
             <!-- 标签模板  -->
             <template v-if="item.type=='addTemplate'">
                 <el-table
                   size='mini'
                   :data="templateTableData"
                   header-row-class-name="yztHeader"
-                  style="width: 500px;border:1px solid rgba(242, 242, 242, 1);border-bottom:none; border-box;">
+                  style="width: 600px;border:1px solid rgba(242, 242, 242, 1);border-bottom:none; border-box;">
                   <el-table-column label="" align="center" width="60">
                     <template slot-scope="scope">
                       <span class="el-icon-close" style="color: red;cursor: pointer;font-weight:800;" @click="delTemplate(scope.row)"></span>
                     </template>
                   </el-table-column>
-                  <el-table-column label="读数名称/单位" width="320">
+                  <el-table-column
+                    type="index"
+                    label="行号"
+                    align="center"
+                    width="60">
+                  </el-table-column>
+                  <el-table-column label="标签模板" width="320">
                     <template slot-scope="scope">
                       <el-select v-model="scope.row.select" placeholder="请选择">
                         <el-option v-for="(selectlistItem,index) in scope.row.selectlist" :label="selectlistItem.label" :value="selectlistItem.value" ></el-option>
                       </el-select>
                     </template>
                   </el-table-column>
-                  <el-table-column prop="default" align="center" label="初始值"></el-table-column>
+                  <el-table-column label="是否默认" align="center" width="auto">
+                    <template slot-scope="scope">
+                     <el-checkbox v-model="scope.row.iSdefault" ></el-checkbox>
+                    </template>
+                  </el-table-column>
                 </el-table>
                 <div class="equipmentReading"><span @click="addTemplate">+添加一行</span></div>
             </template>
-
+            <!-- 自定义字段  -->
+            <template v-if="item.type=='customField'">
+                <el-table
+                  size='mini'
+                  :data="customFieldTableData"
+                  header-row-class-name="yztHeader"
+                  style="width: 500px;border:1px solid rgba(242, 242, 242, 1);border-bottom:none; border-box;">
+                  <el-table-column label="" align="center" width="60">
+                    <template slot-scope="scope">
+                      <span class="el-icon-close" style="color: red;cursor: pointer;font-weight:800;" @click="delCustomField(scope.row)"></span>
+                    </template>
+                  </el-table-column>
+                  <!-- <el-table-column
+                    type="index"
+                    label="行号"
+                    align="center"
+                    width="60">
+                  </el-table-column> -->
+                  <el-table-column label=" 字段名称" width="auto">
+                    <template slot-scope="scope">
+                      <el-input class="customField" v-model="scope.row.filed"></el-input>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label=" 字段值" width="auto">
+                    <template slot-scope="scope">
+                      <el-input class="customField" v-model="scope.row.value"></el-input>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <div class="equipmentReading"><span @click="addCustomField">+添加一行</span></div>
+            </template>
             <!-- 维护策略  -->
             <template v-if="item.type=='strategy'">
               <StrategyTable></StrategyTable>
@@ -358,6 +425,8 @@ export default {
         materialTableData:[],
         // 标签模板tableData
         templateTableData:[],
+        // 自定义字段tableData
+        customFieldTableData:[],
     }
   },
   created() {
@@ -380,6 +449,8 @@ export default {
           case 'addMaterial':
               break;
           case 'addTemplate':
+              break;
+          case 'customField':
               break;
           case 'strategy':
               break;
@@ -404,6 +475,9 @@ export default {
       // console.log(this.form)
     },
     submitForm(formName) {
+      // console.log(this.$refs)
+      // console.log(formName)
+      // console.log(this.$refs[formName])
       this.$refs[formName].validate((valid) => {
         if (valid) {
           alert('submit!');
@@ -460,9 +534,10 @@ export default {
     addKind(){
       let obj={
         id:uuid.v1(),
-        select:'',
-        selectlist:[{label:'产出数量/个',value:'产出数量/个'},{label:'投料数量/个',value:'投料数量/个'},],
-        default: '',
+        select1:'',//次品分类
+        select2:'',//次品项名称
+        selectlist1:[{label:'添加分类11',value:'添加分类11'},{label:'添加分类12',value:'添加分类12'},],
+        selectlist2:[{label:'添加分类21',value:'添加分类21'},{label:'添加分类22',value:'添加分类22'},],
       }
       this.kindTableData.push(obj)
     },
@@ -476,8 +551,12 @@ export default {
     addMaterial(){
       let obj={
         id:uuid.v1(),
-        select:'',
-        selectlist:[{label:'产出数量/个',value:'产出数量/个'},{label:'投料数量/个',value:'投料数量/个'},],
+        select1:'',//名称
+        select2:'',//单位
+        desc:'',//描述
+        num:'',//嵌套数
+        selectlist1:[{label:'物料编号11',value:'物料编号11'},{label:'物料编号12',value:'物料编号12'},],
+        selectlist2:[{label:'个',value:'个'},{label:'千克',value:'千克'},],
         default: '',
       }
       this.materialTableData.push(obj)
@@ -493,10 +572,25 @@ export default {
       let obj={
         id:uuid.v1(),
         select:'',
-        selectlist:[{label:'产出数量/个',value:'产出数量/个'},{label:'投料数量/个',value:'投料数量/个'},],
-        default: '',
+        selectlist:[{label:'标签模板aa',value:'标签模板aa'},{label:'标签模板bb',value:'标签模板bb'},],
+        iSdefault:false,
       }
       this.templateTableData.push(obj)
+    },
+    //自定义字段
+    delCustomField(row) {
+      console.log(row)
+      this.customFieldTableData=this.customFieldTableData.filter((v)=>{
+        return v.id!==row.id
+      })
+    },
+    addCustomField(){
+      let obj={
+        id:uuid.v1(),
+        filed:'测试自定义字段',
+        value:'测试自定义字段值',
+      }
+      this.customFieldTableData.push(obj)
     },
   }
 }
@@ -594,4 +688,14 @@ export default {
 .equipmentReading span:hover{
   color:rgb(64, 158, 255);
 }
+.GeneralForm .addkind>>> .el-input__inner{
+  width:180px;
+}
+.GeneralForm .addMaterial>>> .el-input__inner{
+  width:90px;
+}
+.GeneralForm .customField>>> .el-input__inner{
+  width:190px;
+}
+
 </style>

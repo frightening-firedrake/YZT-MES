@@ -3,6 +3,7 @@
     <div class="panel">
       <div class="title">{{$route.meta.title}}</div>
       <GeneralForm :formdataCreator="formdataCreator" :imgList="imgList" :fileList="fileList" :btnText="btnText" @submitForm="submitForm"></GeneralForm>
+      <AddControls ref='AddControls'></AddControls>
     </div>
   </div>
 </template>
@@ -11,8 +12,9 @@
 // import { getList } from '@/api/table'//引入api接口
 // import GeneralForm from '@/src/components/GeneralForm/index'
 import GeneralForm from '../../../components/GeneralForm/index'
+import AddControls from '../../../components/AddControls/index'
 export default {
-  components:{GeneralForm},
+  components:{GeneralForm,AddControls},
   data() {
     return {
         form: {
@@ -41,10 +43,12 @@ export default {
         // rules对应的表单验证规则复杂我不写了(╯▔皿▔)╯
         // {type:'title',title:'我是一个标题踢踢踢'},//可利用这种方式插入一个标题
         // 时长durationtime
+        // 多选下拉框selectGroup
         // 设备读数equipmentReading
         // 添加分类addKind
         // 添加物料列表addMaterial
         // 添加标签模板addTemplate
+        // 自定义字段customField
 
 
         formdataCreator:[
@@ -66,10 +70,14 @@ export default {
           {type:'textarea',model:'desc',value:'测试输入',label:'请输入多行文字'},
           {type:'textarea',model:'desc2',value:'测试输入',label:'请输入多行文字',disabled:true},
 
+          {type:'selectGroup',model:'selectGroup',optionList:[{label:'工位01',value:'工位01'},{label:'工位02',value:'工位02'},{label:'工位03',value:'工位03'},{label:'工位04',value:'工位04'}],value:['工位03'],label:'工位'},
+
           {type:'equipmentReading',label:'设备读数'},
           {type:'addKind',label:'次品项列表'},
           {type:'addMaterial',label:'物料列表'},
           {type:'addTemplate',label:'标签模板'},
+          {type:'customField',label:'自定义字段'},
+
           {type:'strategy',label:'策略配置'},
           {type:'img',label:'图片'},
           {type:'img',label:'图片',disabled:true},

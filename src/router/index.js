@@ -126,7 +126,37 @@ export const constantRoutes = [{
       }
     ]
   },
-
+  {
+    path: '/BasicData',
+    component: Layout,
+    redirect: '/BasicData/ProductionBOM',
+    name: 'BasicData',
+    meta: {
+      title: '基础数据',
+      icon: 'el-icon-s-help'
+    },
+    children: [{
+        path: 'BasicData/ProductionBOM',
+        name: 'ProductionBOM',
+        component: () => import('@/views//BasicData/ProductionBOM/index'), // Parent router-view
+        meta: {
+          title: '生产BOM',
+          icon: 'table'
+        },
+        children: [
+          {
+            path: 'BasicData/ProductionBOM/CreateProductionBOM',
+            name: 'CreateProductionBOM',
+            component: () => import('@/views/BasicData/ProductionBOM/CreateProductionBOM'),
+            meta: {
+              title: '创建生产BOM',
+              icon: 'table'
+            }
+          },
+        ]
+      },       
+    ]
+  },
   {
     path: '/form',
     component: Layout,
